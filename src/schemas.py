@@ -1,8 +1,7 @@
 from datetime import datetime
+from enum import Enum
 
 from pydantic import BaseModel
-
-from enum import Enum
 
 
 class StatusEnum(str, Enum):
@@ -14,7 +13,7 @@ class Todo(BaseModel):
     id: int
     task: str
     created_at: datetime
-    status: StatusEnum
+    status: StatusEnum | None
     # child tasks
     # comments
     # tags

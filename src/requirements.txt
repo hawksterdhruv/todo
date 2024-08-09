@@ -3,3 +3,4 @@ tinydb
 tinydb-serialization
 pydantic
 uvicorn
+jinja2

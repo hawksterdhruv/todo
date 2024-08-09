@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="/static/output.css" rel="stylesheet">
+</head>
+<body>
+<div class="grid grid-cols-5 grid-rows-3 gap-4">
+    <div class="col-start-2 col-span-3 border rounded">
+        <h1 class="text-8xl text-orange-400 text-center">Hello World</h1>
+    </div>
+    <div id="content" class="col-start-2 col-span-3 row-start-2 border rounded">
+        {% block content %}
+
+        {% endblock content %}
+    </div>
+</div>
+</body>
+</html>

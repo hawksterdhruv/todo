@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<ul class="p-2">
+    {% for todo in todos %}
+    <li>
+        {{ todo.status }}
+        {{ todo.task }}
+    </li>
+    {% endfor %}
+</ul>
+
+{% endblock content %}
