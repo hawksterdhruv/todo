@@ -2,13 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Todo</title>
     <link href="/static/output.css" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@2.0.1/dist/htmx.js"
+            integrity="sha384-gpIh5aLQ0qmX8kZdyhsd6jA24uKLkqIr1WAGtantR4KsS97l/NRBvh8/8OYGThAf"
+            crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 </head>
 <body>
-<div class="grid grid-cols-5 grid-rows-3 gap-4">
+<div class="grid grid-cols-5 grid-flow-rows gap-4">
     <div class="col-start-2 col-span-3 border rounded">
-        <h1 class="text-8xl text-orange-400 text-center">Hello World</h1>
+        <h1 class="text-8xl text-orange-400 text-center">ToDo</h1>
     </div>
     <div id="content" class="col-start-2 col-span-3 row-start-2 border rounded">
         {% block content %}

@@ -1,13 +1,36 @@
 {% extends "base.html" %}
 
 {% block content %}
-<ul class="p-2">
+<ul class="p-2" id="tasks-pane">
     {% for todo in todos %}
-    <li>
-        {{ todo.status }}
-        {{ todo.task }}
+    {% block task scoped %}
+    <li class="my-1 mx-1">
+        <!--            <select name="status">-->
+        <!--                <option value=""></option>-->
+        <!--                <option value="done">Done</option>-->
+        <!--                <option value="in-progress">In Progress</option>-->
+        <!--                &lt;!&ndash;   todo : add id to this. &ndash;&gt;-->
+        <!--            </select>-->
+        {% if todo.status == 'done' %}
+        <i class="fa-regular fa-square-check"></i>
+        {% else %}
+        <i class="fa-regular fa-square"
+           hx-trigger="click"
+           hx-target="this" ></i>
+        {% endif %}
+        <span>{{ todo.task }}</span>
     </li>
+    {% endblock task %}
     {% endfor %}
 </ul>
-
+<input class="border rounded w-full py-2 px-3 text-gray-700"
+       id="task" type="text"
+       name="task"
+       placeholder="Add New Task"
+       hx-trigger="keyup[key=='Enter']"
+       hx-post="{{ url_for('add_todo')}}"
+       hx-target="#tasks-pane"
+       hx-swap="beforeend"
+       hx-ext="json-enc"
+>
 {% endblock content %}

@@ -2,7 +2,9 @@
 
 ## upcoming features
 - [x] Display Dashboard
-- add new tasks
+- [x] add new tasks
+- [x] add htmx
+- update status for tasks
 - comments for tasks
 - tags for tasks
 - enddate for tasks

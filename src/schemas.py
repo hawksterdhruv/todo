@@ -10,10 +10,10 @@ class StatusEnum(str, Enum):
 
 
 class Todo(BaseModel):
-    id: int
+    id: int | None = None
     task: str
-    created_at: datetime
-    status: StatusEnum | None
+    created_at: datetime = datetime.now()
+    status: StatusEnum | None = None
     # child tasks
     # comments
     # tags
