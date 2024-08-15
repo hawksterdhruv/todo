@@ -1,12 +1,12 @@
 import logging
-
+import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from jinja2_fragments.fastapi import Jinja2Blocks
 
 from .db import get_max_index
-from .handlers import (get_all_todos_handler, add_todo_handler)
+from .handlers import (get_all_todos_handler, add_todo_handler, update_todo_handler, get_todo)
 from .schemas import Todo
 
 app = FastAPI()
@@ -26,6 +26,7 @@ max_index = get_max_index()
 @app.get("/")
 async def read_item(request: Request):
     todos = get_all_todos_handler()
+    logger.info(todos)
     return templates.TemplateResponse(name="todos.html",
                                       context={'todos': todos, 'request': request})
 
@@ -39,6 +40,16 @@ async def add_todo(request: Request):
     logger.info(todo)
     todo = add_todo_handler(todo)
     max_index += 1
+    return templates.TemplateResponse(name="todos.html",
+                                      context={'todo': todo, 'request': request},
+                                      block_name='task')
+
+
+@app.put('/{todo_id}')
+async def update_todo(request: Request, todo_id: int):
+    raw_todo = await request.json()
+
+    todo = update_todo_handler(todo_id, raw_todo)
     return templates.TemplateResponse(name="todos.html",
                                       context={'todo': todo, 'request': request},
                                       block_name='task')

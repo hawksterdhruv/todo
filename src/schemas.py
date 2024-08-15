@@ -5,15 +5,18 @@ from pydantic import BaseModel
 
 
 class StatusEnum(str, Enum):
+    # todo: make statuses configurable
     done = 'done'
     in_progress = 'in progress'
+    removed = 'removed'
+    blocked = 'blocked'
 
 
 class Todo(BaseModel):
     id: int | None = None
     task: str
     created_at: datetime = datetime.now()
-    status: StatusEnum | None = None
+    status: StatusEnum = StatusEnum.in_progress
     # child tasks
     # comments
     # tags

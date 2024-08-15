@@ -5,7 +5,7 @@ from tinydb_serialization.serializers import DateTimeSerializer
 
 serialization = SerializationMiddleware(JSONStorage)
 serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
-db = TinyDB('todos_db.json', storage=serialization)
+db = TinyDB('todos_db.json', storage=serialization, indent=2)
 
 
 def get_max_index():

@@ -4,19 +4,16 @@
 <ul class="p-2" id="tasks-pane">
     {% for todo in todos %}
     {% block task scoped %}
-    <li class="my-1 mx-1">
-        <!--            <select name="status">-->
-        <!--                <option value=""></option>-->
-        <!--                <option value="done">Done</option>-->
-        <!--                <option value="in-progress">In Progress</option>-->
-        <!--                &lt;!&ndash;   todo : add id to this. &ndash;&gt;-->
-        <!--            </select>-->
+    <li class="my-1 mx-1" hx-target="this" hx-swap="outerHTML">
         {% if todo.status == 'done' %}
         <i class="fa-regular fa-square-check"></i>
         {% else %}
         <i class="fa-regular fa-square"
            hx-trigger="click"
-           hx-target="this" ></i>
+           hx-put="{{ url_for('update_todo', todo_id=todo.id) }}"
+           hx-ext="json-enc"
+           hx-vals='{"status":"done"}'
+        ></i>
         {% endif %}
         <span>{{ todo.task }}</span>
     </li>
