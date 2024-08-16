@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from jinja2_fragments.fastapi import Jinja2Blocks
 
 from .db import get_max_index
-from .handlers import (get_all_todos_handler, add_todo_handler, update_todo_handler, get_todo)
+from .handlers import (get_all_todos_handler, add_todo_handler, update_todo_handler, get_todo_handler)
 from .schemas import Todo
 
 app = FastAPI()
@@ -24,9 +24,8 @@ max_index = get_max_index()
 
 
 @app.get("/")
-async def read_item(request: Request):
+async def get_todos(request: Request):
     todos = get_all_todos_handler()
-    logger.info(todos)
     return templates.TemplateResponse(name="todos.html",
                                       context={'todos': todos, 'request': request})
 
@@ -37,7 +36,7 @@ async def add_todo(request: Request):
     todo = Todo(**raw_todo)
     global max_index
     todo.id = max_index + 1
-    logger.info(todo)
+
     todo = add_todo_handler(todo)
     max_index += 1
     return templates.TemplateResponse(name="todos.html",
@@ -45,10 +44,18 @@ async def add_todo(request: Request):
                                       block_name='task')
 
 
+@app.get('/{todo_id}')
+async def get_todo(request: Request, todo_id: int):
+    todo = get_todo_handler(todo_id)
+
+    return templates.TemplateResponse(name="todos.html",
+                                      context={'todo_focus': todo, 'request': request},
+                                      block_name='detail_view')
+
+
 @app.put('/{todo_id}')
 async def update_todo(request: Request, todo_id: int):
     raw_todo = await request.json()
-
     todo = update_todo_handler(todo_id, raw_todo)
     return templates.TemplateResponse(name="todos.html",
                                       context={'todo': todo, 'request': request},

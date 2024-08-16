@@ -19,3 +19,4 @@
 - Allow to delete tasks or add a "not to be done" status
   - Hide these tasks
 - Search for tasks
+- switch to sqlite

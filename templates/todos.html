@@ -15,7 +15,10 @@
            hx-vals='{"status":"done"}'
         ></i>
         {% endif %}
-        <span>{{ todo.task }}</span>
+        <span hx-target="#detail-view" hx-trigger="click" hx-get="{{url_for('get_todo',todo_id=todo.id)}}"
+              hx-swap="innerHTML">
+            {{ todo.task }}
+        </span>
     </li>
     {% endblock task %}
     {% endfor %}
@@ -31,3 +34,14 @@
        hx-ext="json-enc"
 >
 {% endblock content %}
+{% block detail_view %}
+{% if todo_focus %}
+<div class=" border rounded" hx-target="this" hx-swap="delete">
+    <i class="fa-solid fa-xmark" hx-trigger="click"></i>
+    <p>{{todo_focus.id}}</p>
+    <p>{{todo_focus.task}}</p>
+    <p>{{todo_focus.created_at}}</p>
+    <p>{{todo_focus.status}}</p>
+</div>
+{%endif%}
+{% endblock detail_view %}

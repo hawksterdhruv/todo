@@ -16,11 +16,16 @@
     <div class="col-start-2 col-span-3 border rounded">
         <h1 class="text-8xl text-orange-400 text-center">ToDo</h1>
     </div>
-    <div id="content" class="col-start-2 col-span-3 row-start-2 border rounded">
+    <div id="detail-view" class="row-start-2 col-start-2 col-span-3">
+        {% block detail_view %}
+        {% endblock detail_view %}
+    </div>
+    <div id="content" class="row-start-3 col-start-2 col-span-3 border rounded">
         {% block content %}
 
         {% endblock content %}
     </div>
+
 </div>
 </body>
 </html>
