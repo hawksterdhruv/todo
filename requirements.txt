@@ -4,6 +4,7 @@ uvicorn
 
 tinydb
 tinydb-serialization
+pypika
 
 jinja2
 jinja2_fragments
