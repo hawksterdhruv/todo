@@ -37,7 +37,7 @@
             <span hx-target="#detail-view" hx-trigger="click" hx-get="/{{todo.id}}"
                   hx-swap="innerHTML"
                   data-modal-target="detail-view" data-modal-toggle="detail-view">
-                       Task Description Incomplete
+                       {{ todo.task }}
                     </span><span class="border rounded-full m-1 p-1 bg-red-300">Work</span>
         </li>
         {% endfor %}
@@ -51,7 +51,7 @@
             <span hx-target="#detail-view" hx-trigger="click" hx-get="/{{todo.id}}"
                   hx-swap="innerHTML"
                   data-modal-target="detail-view" data-modal-toggle="detail-view">
-                       Task Description Complete
+                          {{ todo.task }}
                     </span>
         </li>
         {% endfor %}

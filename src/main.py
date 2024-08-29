@@ -1,15 +1,15 @@
 import logging
-import uvicorn
+
 from fastapi import FastAPI, Request, Depends
-from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from jinja2_fragments.fastapi import Jinja2Blocks
 from sqlalchemy.orm import Session
 
 from . import models
 from .db import engine, SessionLocal
-from .handlers import (get_all_todos_handler, add_todo_handler, update_todo_handler, get_todo_handler)
-from .schemas import Todo, TodoCreate
+from .handlers import (get_incomplete_todos_handler, get_completed_todos_handler, add_todo_handler, update_todo_handler,
+                       get_todo_handler)
+from .schemas import TodoCreate
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -31,7 +31,7 @@ templates = Jinja2Blocks(directory="templates")
 
 # app.include_router(router)
 
-logger = logging.getLogger('uvicorn.main')
+logger = logging.getLogger('uvicorn')
 logger.setLevel(logging.INFO)
 
 
@@ -40,9 +40,11 @@ logger.setLevel(logging.INFO)
 
 @app.get("/")
 async def get_todos(request: Request, db: Session = Depends(get_db)):
-    todos = get_all_todos_handler(db)
+    incomplete_todos = get_incomplete_todos_handler(db)
+    completed_todos = get_completed_todos_handler(db)
     return templates.TemplateResponse(name="todos.html",
-                                      context={'todos': todos, 'request': request})
+                                      context={'todos_incomplete': incomplete_todos, 'todos_done': completed_todos,
+                                               'request': request})
 
 
 @app.post('/')

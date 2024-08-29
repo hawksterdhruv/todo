@@ -5,12 +5,18 @@ from sqlalchemy.orm import Session
 from . import models
 from . import schemas
 
-logger = logging.getLogger('uvicorn.handler')
+logger = logging.getLogger('uvicorn')
 logger.setLevel(logging.INFO)
 
 
-def get_all_todos_handler(db: Session):
-    return db.query(models.Todo).all()
+def get_completed_todos_handler(db: Session):
+    logger.info(db.query(models.Todo).filter_by(status='done'))
+    return db.query(models.Todo).filter_by(status='done')
+
+
+def get_incomplete_todos_handler(db: Session):
+    logger.info(db.query(models.Todo).filter_by(status='in progress'))
+    return db.query(models.Todo).filter_by(status='in progress')
 
 
 def add_todo_handler(db: Session, todo: schemas.TodoCreate) -> models.Todo:
