@@ -1,47 +1,82 @@
 {% extends "base.html" %}
 
+{% block label_maker %}
+<div id="label-maker" class="border rounded p-2 m-2 flex flex-wrap">
+    <input class="border rounded min-w-full py-2 px-3 text-gray-700 mb-2" placeholder="Create new label">
+    <span class="border rounded-full m-1 p-1 bg-indigo-300 text-xs">Label 1</span>
+    <span class="border rounded-full m-1 p-1 bg-indigo-300 text-xs">Label 2</span>
+    <span class="border rounded-full m-1 p-1 bg-indigo-300 text-xs">Label 3</span>
+    <span class="border rounded-full m-1 p-1 bg-indigo-300 text-xs">Label 4</span>
+    <span class="border rounded-full m-1 p-1 bg-indigo-300 text-xs">Label 5</span>
+    <span class="border rounded-full m-1 p-1 bg-indigo-300 text-xs">Label 6</span>
+</div>
+{% endblock label_maker %}
+
 {% block content %}
-<ul class="p-2" id="tasks-pane">
-    {% for todo in todos %}
-    {% block task scoped %}
-    <li class="my-1 mx-1" hx-target="this" hx-swap="outerHTML">
-        {% if todo.status == 'done' %}
-        <i class="fa-regular fa-square-check"></i>
-        {% else %}
-        <i class="fa-regular fa-square"
-           hx-trigger="click"
-           hx-put="{{ url_for('update_todo', todo_id=todo.id) }}"
+<div id="incomplete-tasks" class="border rounded m-2 p-2">
+    <input class="border rounded w-full py-2 px-3 text-gray-700"
+           id="task" type="text"
+           name="task"
+           placeholder="Add New Task"
+           hx-trigger="keyup[key=='Enter']"
+           hx-post="{{ url_for('add_todo')}}"
+           hx-target="#tasks-pane"
+           hx-swap="beforeend"
            hx-ext="json-enc"
-           hx-vals='{"status":"done"}'
-        ></i>
-        {% endif %}
-        <span hx-target="#detail-view" hx-trigger="click" hx-get="{{url_for('get_todo',todo_id=todo.id)}}"
-              hx-swap="innerHTML">
-            {{ todo.task }}
-        </span>
-    </li>
-    {% endblock task %}
-    {% endfor %}
-</ul>
-<input class="border rounded w-full py-2 px-3 text-gray-700"
-       id="task" type="text"
-       name="task"
-       placeholder="Add New Task"
-       hx-trigger="keyup[key=='Enter']"
-       hx-post="{{ url_for('add_todo')}}"
-       hx-target="#tasks-pane"
-       hx-swap="beforeend"
-       hx-ext="json-enc"
->
+    >
+    <!-- List of Tasks -->
+    <ul id="tasks-pane">
+        {% for todo in todos_incomplete %}
+        <li>
+            <i class="fa-regular fa-square"
+               hx-trigger="click"
+               hx-put="/{{ todo.id }}"
+               hx-ext="json-enc"
+               hx-vals='{"status":"done"}'
+            ></i>
+            <span hx-target="#detail-view" hx-trigger="click" hx-get="/{{todo.id}}"
+                  hx-swap="innerHTML"
+                  data-modal-target="detail-view" data-modal-toggle="detail-view">
+                       Task Description Incomplete
+                    </span><span class="border rounded-full m-1 p-1 bg-red-300">Work</span>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+<div id="complete-tasks" class="border rounded m-2 p-2">
+    <ul>
+        {% for todo in todos_done %}
+        <li class="my-1 mx-1" hx-target="this" hx-swap="outerHTML">
+            <i class="fa-regular fa-square-check"></i>
+            <span hx-target="#detail-view" hx-trigger="click" hx-get="/{{todo.id}}"
+                  hx-swap="innerHTML"
+                  data-modal-target="detail-view" data-modal-toggle="detail-view">
+                       Task Description Complete
+                    </span>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock content %}
+
+<!----------------------------------------------------------->
 {% block detail_view %}
 {% if todo_focus %}
-<div class=" border rounded" hx-target="this" hx-swap="delete">
-    <i class="fa-solid fa-xmark" hx-trigger="click"></i>
-    <p>{{todo_focus.id}}</p>
-    <p>{{todo_focus.task}}</p>
-    <p>{{todo_focus.created_at}}</p>
-    <p>{{todo_focus.status}}</p>
+<div id="detail-view" class="border rounded p-2 m-2">
+    <!--            <div class="border border-dashed rounded border-red-300 w-full m-1 " hx-target="this" hx-swap="delete">-->
+    <div class="w-full m-1 " hx-target="this" hx-swap="delete">
+        <!--    <i class="fa-solid fa-xmark" hx-trigger="click"></i>-->
+        <p>{{todo_focus.id}}</p>
+        <p>{{todo_focus.task}}</p>
+        <p>{{todo_focus.created_at}}</p>
+        <p>{{todo_focus.status}}</p>
+    </div>
+    <!--            <div class="border border-dashed rounded border-red-300 m-1 w-full">-->
+    <div class="m-1 w-full">
+                <span class="border rounded-full h-8 w-8 inline-block flex justify-center">
+                <i class="fa-solid fa-plus text-xl"></i>
+                </span>
+    </div>
 </div>
 {%endif%}
 {% endblock detail_view %}
