@@ -12,18 +12,31 @@ class StatusEnum(str, Enum):
     blocked = 'blocked'
 
 
-class Todo(BaseModel):
-    id: int | None = None
+class TodoBase(BaseModel):
     task: str
     created_at: datetime = datetime.now()
     status: StatusEnum = StatusEnum.in_progress
+
+
+class TodoCreate(TodoBase):
+    pass
+
+
+class Todo(TodoBase):
+    id: int | None
+
+    class Config:
+        orm_model = True
     # child tasks
-    # comments
     # tags
 
 
 class Comment(BaseModel):
-    pass
+    id: int
+    comment: str
+
+    class Config:
+        orm_model = True
 
 
 class Tag(BaseModel):

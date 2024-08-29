@@ -1,33 +1,31 @@
 import logging
 
-from .db import db
-from .schemas import Todo
-from tinydb import Query
+from sqlalchemy.orm import Session
+
+from . import models
+from . import schemas
 
 logger = logging.getLogger('uvicorn.handler')
 logger.setLevel(logging.INFO)
 
 
-def get_all_todos_handler() -> list[Todo]:
-    return [Todo(**a) for a in db.all()]
+def get_all_todos_handler(db: Session):
+    return db.query(models.Todo).all()
 
 
-def add_todo_handler(todo: Todo) -> Todo:
-    db.insert(dict(todo))
-    return todo
+def add_todo_handler(db: Session, todo: schemas.TodoCreate) -> models.Todo:
+    db_todo = models.Todo(**todo.model_dump())
+    db.add(db_todo)
+    db.commit()
+    db.refresh(db_todo)
+    return db_todo
 
 
-def get_todo_handler(todo_id) -> Todo:
-    todo_query = Query()
-    todo_raw = db.search(todo_query.id == todo_id).pop()
-    return Todo(**todo_raw)
+def get_todo_handler(db: Session, todo_id: int) -> models.Todo:
+    return db.query(models.Todo).filter(models.Todo.id == todo_id).one()  # type:ignore
 
 
-def update_todo_handler(todo_id, todo_raw) -> Todo:
-    logger.info(todo_id)
-    logger.info(todo_raw)
-    todo_query = Query()
-    db.update(todo_raw, todo_query.id == todo_id)
-    todo = get_todo_handler(todo_id)
-    logger.info(todo)
+def update_todo_handler(db: Session, todo_id, todo_raw) -> models.Todo:
+    todo = db.query(models.Todo).filter(models.Todo.id == todo_id).update(todo_raw)  # type:ignore
+    db.commit()
     return todo

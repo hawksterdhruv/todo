@@ -1,14 +1,14 @@
-from tinydb import TinyDB
-from tinydb.storages import JSONStorage
-from tinydb_serialization import SerializationMiddleware
-from tinydb_serialization.serializers import DateTimeSerializer
+# from tinydb import TinyDB
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-serialization = SerializationMiddleware(JSONStorage)
-serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
-db = TinyDB('todos_db.json', storage=serialization, indent=2)
+SQLALCHEMY_DATABASE_URL = "sqlite:///./todo.db"
+# SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
 
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-def get_max_index():
-    todo = db.get(doc_id=len(db))
-
-    return todo['id'] if todo else 0
+Base = declarative_base()

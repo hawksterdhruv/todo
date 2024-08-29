@@ -1,13 +1,27 @@
 import logging
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from jinja2_fragments.fastapi import Jinja2Blocks
+from sqlalchemy.orm import Session
 
-from .db import get_max_index
+from . import models
+from .db import engine, SessionLocal
 from .handlers import (get_all_todos_handler, add_todo_handler, update_todo_handler, get_todo_handler)
-from .schemas import Todo
+from .schemas import Todo, TodoCreate
+
+models.Base.metadata.create_all(bind=engine)
+
+
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -17,46 +31,43 @@ templates = Jinja2Blocks(directory="templates")
 
 # app.include_router(router)
 
-logger = logging.getLogger('uvicorn')
+logger = logging.getLogger('uvicorn.main')
 logger.setLevel(logging.INFO)
 
-max_index = get_max_index()
+
+# max_index = get_max_index()
 
 
 @app.get("/")
-async def get_todos(request: Request):
-    todos = get_all_todos_handler()
+async def get_todos(request: Request, db: Session = Depends(get_db)):
+    todos = get_all_todos_handler(db)
     return templates.TemplateResponse(name="todos.html",
                                       context={'todos': todos, 'request': request})
 
 
 @app.post('/')
-async def add_todo(request: Request):
+async def add_todo(request: Request, db: Session = Depends(get_db)):
     raw_todo = await request.json()
-    todo = Todo(**raw_todo)
-    global max_index
-    todo.id = max_index + 1
-
-    todo = add_todo_handler(todo)
-    max_index += 1
+    todo = TodoCreate(**raw_todo)
+    todo = add_todo_handler(db, todo)
     return templates.TemplateResponse(name="todos.html",
                                       context={'todo': todo, 'request': request},
                                       block_name='task')
 
 
 @app.get('/{todo_id}')
-async def get_todo(request: Request, todo_id: int):
-    todo = get_todo_handler(todo_id)
-
+async def get_todo(todo_id: int, request: Request, db: Session = Depends(get_db)):
+    todo = get_todo_handler(db, todo_id)
     return templates.TemplateResponse(name="todos.html",
                                       context={'todo_focus': todo, 'request': request},
                                       block_name='detail_view')
 
 
 @app.put('/{todo_id}')
-async def update_todo(request: Request, todo_id: int):
+async def update_todo(todo_id: int, request: Request, db: Session = Depends(get_db)):
     raw_todo = await request.json()
-    todo = update_todo_handler(todo_id, raw_todo)
+    todo = update_todo_handler(db, todo_id, raw_todo)
+    logger.info(todo)
     return templates.TemplateResponse(name="todos.html",
                                       context={'todo': todo, 'request': request},
                                       block_name='task')

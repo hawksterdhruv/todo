@@ -2,9 +2,7 @@ fastapi[standard]
 pydantic
 uvicorn
 
-tinydb
-tinydb-serialization
-pypika
+sqlalchemy
 
 jinja2
 jinja2_fragments
