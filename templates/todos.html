@@ -11,6 +11,7 @@
     <span class="border rounded-full m-1 p-1 bg-indigo-300 text-xs">Label 6</span>
 </div>
 {% endblock label_maker %}
+<!----------------------------------------------------------->
 
 {% block content %}
 <div id="incomplete-tasks" class="border rounded m-2 p-2">
@@ -27,6 +28,7 @@
     <!-- List of Tasks -->
     <ul id="tasks-pane">
         {% for todo in todos_incomplete %}
+        {% block todo_incomplete scoped %}
         <li>
             <i class="fa-regular fa-square"
                hx-trigger="click"
@@ -35,25 +37,27 @@
                hx-vals='{"status":"done"}'
             ></i>
             <span hx-target="#detail-view" hx-trigger="click" hx-get="/{{todo.id}}"
-                  hx-swap="innerHTML"
-                  data-modal-target="detail-view" data-modal-toggle="detail-view">
-                       {{ todo.task }}
-                    </span><span class="border rounded-full m-1 p-1 bg-red-300">Work</span>
+                  hx-swap="innerHTML">
+               {{ todo.task }}
+            </span>
+            <span class="border rounded-full m-1 p-1 bg-red-300">Work</span>
         </li>
+        {% endblock todo_incomplete %}
         {% endfor %}
     </ul>
 </div>
 <div id="complete-tasks" class="border rounded m-2 p-2">
     <ul>
         {% for todo in todos_done %}
+        {% block todo_complete scoped %}
         <li class="my-1 mx-1" hx-target="this" hx-swap="outerHTML">
             <i class="fa-regular fa-square-check"></i>
             <span hx-target="#detail-view" hx-trigger="click" hx-get="/{{todo.id}}"
-                  hx-swap="innerHTML"
-                  data-modal-target="detail-view" data-modal-toggle="detail-view">
+                  hx-swap="innerHTML">
                           {{ todo.task }}
                     </span>
         </li>
+        {% endblock todo_complete %}
         {% endfor %}
     </ul>
 </div>
@@ -61,22 +65,24 @@
 
 <!----------------------------------------------------------->
 {% block detail_view %}
-{% if todo_focus %}
-<div id="detail-view" class="border rounded p-2 m-2">
-    <!--            <div class="border border-dashed rounded border-red-300 w-full m-1 " hx-target="this" hx-swap="delete">-->
-    <div class="w-full m-1 " hx-target="this" hx-swap="delete">
-        <!--    <i class="fa-solid fa-xmark" hx-trigger="click"></i>-->
-        <p>{{todo_focus.id}}</p>
-        <p>{{todo_focus.task}}</p>
-        <p>{{todo_focus.created_at}}</p>
-        <p>{{todo_focus.status}}</p>
-    </div>
-    <!--            <div class="border border-dashed rounded border-red-300 m-1 w-full">-->
-    <div class="m-1 w-full">
+<div id="detail-view" class="">
+    {% if todo_focus %}
+    <div class="border rounded p-2 m-2">
+        <!--            <div class="border border-dashed rounded border-red-300 w-full m-1 " hx-target="this" hx-swap="delete">-->
+        <div class="w-full m-1" hx-target="this" hx-swap="delete">
+            <!--    <i class="fa-solid fa-xmark" hx-trigger="click"></i>-->
+            <p>{{todo_focus.id}}</p>
+            <p>{{todo_focus.task}}</p>
+            <p>{{todo_focus.created_at}}</p>
+            <p>{{todo_focus.status}}</p>
+        </div>
+        <!--            <div class="border border-dashed rounded border-red-300 m-1 w-full">-->
+        <div class="m-1 w-full">
                 <span class="border rounded-full h-8 w-8 inline-block flex justify-center">
                 <i class="fa-solid fa-plus text-xl"></i>
                 </span>
+        </div>
     </div>
+    {%endif%}
 </div>
-{%endif%}
 {% endblock detail_view %}

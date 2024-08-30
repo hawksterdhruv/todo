@@ -52,9 +52,10 @@ async def add_todo(request: Request, db: Session = Depends(get_db)):
     raw_todo = await request.json()
     todo = TodoCreate(**raw_todo)
     todo = add_todo_handler(db, todo)
+
     return templates.TemplateResponse(name="todos.html",
-                                      context={'todo': todo, 'request': request},
-                                      block_name='task')
+                                      context={'todo_incomplete': todo, 'request': request},
+                                      block_name='task_incomplete')
 
 
 @app.get('/{todo_id}')
@@ -72,7 +73,7 @@ async def update_todo(todo_id: int, request: Request, db: Session = Depends(get_
     logger.info(todo)
     return templates.TemplateResponse(name="todos.html",
                                       context={'todo': todo, 'request': request},
-                                      block_name='task')
+                                      block_name='detail_view')
 
 
 if __name__ == '__main__':

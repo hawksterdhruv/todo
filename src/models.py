@@ -7,8 +7,8 @@ from .db import Base
 
 todo_tag = Table(
     'todo_tag', Base.metadata,
-    Column(Integer, ForeignKey('todo.id')),
-    Column(Integer, ForeignKey('tag.id'))
+    Column('todo_id', Integer, ForeignKey('todo.id')),
+    Column('tag_id', Integer, ForeignKey('tag.id'))
 )
 
 
@@ -30,7 +30,7 @@ class Comment(Base):
     comment = Column(String)
     todo_id = Column(Integer, ForeignKey('todo.id'))
     created_at = Column(DateTime, default=datetime.now())
-    todos = relationship('Todo', back_populates='comments')
+    todo = relationship('Todo', back_populates='comments')
 
 
 class Tag(Base):
