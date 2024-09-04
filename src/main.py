@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from . import models
 from .db import engine, SessionLocal
 from .handlers import (get_incomplete_todos_handler, get_completed_todos_handler, add_todo_handler, update_todo_handler,
-                       get_todo_handler)
+                       get_todo_handler, add_comment_handler)
 from .schemas import TodoCreate
 
 models.Base.metadata.create_all(bind=engine)
@@ -74,6 +74,15 @@ async def update_todo(todo_id: int, request: Request, db: Session = Depends(get_
     return templates.TemplateResponse(name="todos.html",
                                       context={'todo': todo, 'request': request},
                                       block_name='detail_view')
+
+
+@app.post('/comment')
+async def add_comment(request: Request, db: Session = Depends(get_db)):
+    raw_comment = await request.json()
+    comment = add_comment_handler(db, raw_comment)
+    logger.info(comment)
+    return templates.TemplateResponse(name='todo.html', context={'comment': comment, 'request': request},
+                                      block_name='comment')
 
 
 if __name__ == '__main__':

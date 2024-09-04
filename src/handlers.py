@@ -35,3 +35,11 @@ def update_todo_handler(db: Session, todo_id, todo_raw) -> models.Todo:
     todo = db.query(models.Todo).filter(models.Todo.id == todo_id).update(todo_raw)  # type:ignore
     db.commit()
     return todo
+
+
+def add_comment_handler(db: Session, todo_id, raw_comment) -> models.Comment:
+    db_comment = models.Comment(**raw_comment.model_dump())
+    db.add(db_comment)
+    db.commit()
+    db.refresh(db_comment)
+    return db_comment
