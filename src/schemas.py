@@ -39,5 +39,16 @@ class Comment(BaseModel):
         orm_model = True
 
 
-class Tag(BaseModel):
+class TagBase(BaseModel):
+    tag: str
+
+
+class TagCreate(TagBase):
     pass
+
+
+class Tag(TagBase):
+    id: int | None
+
+    class Config:
+        orm_model = True
