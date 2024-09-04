@@ -37,6 +37,26 @@ def update_todo_handler(db: Session, todo_id, todo_raw) -> models.Todo:
     return todo
 
 
+def update_todo_tag_handler(db: Session, todo_id, todo_raw) -> models.Todo:
+    tag = db.query(models.Tag).filter(models.Tag.id == todo_raw['tag_id']).one()  # type:ignore
+    todo = db.query(models.Todo).filter(models.Todo.id == todo_id).one()  # type:ignore
+    todo.tags.append(tag)
+    db.commit()
+    return todo
+
+
+def get_all_tags_handler(db: Session) -> list[type[models.Tag]]:
+    return db.query(models.Tag).all()
+
+
+def add_tag_handler(db: Session, tag_raw: schemas.TagCreate) -> models.Tag:
+    db_tag = models.Tag(**tag_raw.model_dump())
+    db.add(db_tag)
+    db.commit()
+    db.refresh(db_tag)
+    return db_tag
+
+
 def add_comment_handler(db: Session, todo_id, raw_comment) -> models.Comment:
     db_comment = models.Comment(**raw_comment.model_dump())
     db.add(db_comment)

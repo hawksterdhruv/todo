@@ -1,14 +1,33 @@
 {% extends "base.html" %}
+<!----------------------------------------------------------->
+
+
+{% macro tag_creation_macro(tag_value) %}
+<span class="border rounded-full m-1 p-1 bg-indigo-300 text-xs">
+    {{ tag_value.tag }}
+</span>
+{% endmacro %}
+
+{% macro tag_todo_macro(tag_value) %}
+<span class="border rounded-full m-1 p-1 bg-indigo-300 text-xs">
+    {{ tag_value.tag }}
+</span>
+{% endmacro %}
+
 
 {% block label_maker %}
 <div id="label-maker" class="border rounded p-2 m-2 flex flex-wrap">
-  <input class="border rounded min-w-full py-2 px-3 text-gray-700 mb-2" placeholder="Create new label">
-  <span class="border rounded-full m-1 p-1 bg-indigo-300 text-xs">Label 1</span>
-  <span class="border rounded-full m-1 p-1 bg-indigo-300 text-xs">Label 2</span>
-  <span class="border rounded-full m-1 p-1 bg-indigo-300 text-xs">Label 3</span>
-  <span class="border rounded-full m-1 p-1 bg-indigo-300 text-xs">Label 4</span>
-  <span class="border rounded-full m-1 p-1 bg-indigo-300 text-xs">Label 5</span>
-  <span class="border rounded-full m-1 p-1 bg-indigo-300 text-xs">Label 6</span>
+  <input class="border rounded min-w-full py-2 px-3 text-gray-700 mb-2"id="tag" type="text" name="tag"
+           placeholder="Create new label"
+  hx-trigger="keyup[key=='Enter']"
+           hx-post="{{ url_for('add_tag')}}"
+           hx-target="#label-maker"
+           hx-swap="beforeend"
+  hx-ext="json-enc"
+  >
+  {% for tag in tags %}
+  {{ tag_creation_macro(tag) }}
+  {% endfor %}
 </div>
 {% endblock label_maker %}
 <!----------------------------------------------------------->
@@ -32,15 +51,17 @@
     <li>
       <i class="fa-regular fa-square"
          hx-trigger="click"
-         hx-put="/{{ todo.id }}"
+         hx-put="{{ url_for('update_todo', todo_id=todo.id) }}"
          hx-ext="json-enc"
          hx-vals='{"status":"done"}'
       ></i>
-      <span hx-target="#detail-view" hx-trigger="click" hx-get="/{{todo.id}}"
+      <span hx-target="#detail-view" hx-trigger="click" hx-get="{{ url_for('get_todo', todo_id=todo.id) }}"
             hx-swap="innerHTML">
                {{ todo.task }}
             </span>
-      <span class="border rounded-full m-1 p-1 bg-red-300">Work</span>
+      {% for tag in todo.tags %}
+            {{ tag_todo_macro(tag) }}
+            {% endfor %}
     </li>
     {% endblock todo_incomplete %}
     {% endfor %}
@@ -52,10 +73,13 @@
     {% block todo_complete scoped %}
     <li class="my-1 mx-1" hx-target="this" hx-swap="outerHTML">
       <i class="fa-regular fa-square-check"></i>
-      <span hx-target="#detail-view" hx-trigger="click" hx-get="/{{todo.id}}"
+      <span hx-target="#detail-view" hx-trigger="click" hx-get="{{url_for('get_todo',todo_id=todo.id)}}"
             hx-swap="innerHTML">
-                          {{ todo.task }}
-                    </span>
+                {{ todo.task }}
+            </span>
+            {% for tag in todo.tags %}
+            {{ tag_todo_macro(tag) }}
+            {% endfor %}
     </li>
     {% endblock todo_complete %}
     {% endfor %}
@@ -65,6 +89,7 @@
 
 <!----------------------------------------------------------->
 {% block detail_view %}
+
 <div id="detail-view" class="">
   {% if todo_focus %}
   <div class="border rounded p-2 m-2">
@@ -76,7 +101,15 @@
       <p>{{todo_focus.created_at}}</p>
       <p>{{todo_focus.status}}</p>
     </div>
-    <!--            <div class="border border-dashed rounded border-red-300 m-1 w-full">-->
+    <div>
+            {% for tag in todo_focus.tags %}
+            {# onclick : remove tag #}
+            <span class="border rounded-full m-1 p-1 bg-orange-300 text-xs">
+            {{ tag.tag }}
+            </span>
+            {% endfor %}
+        </div>
+        <!-- <div class="border border-dashed rounded border-red-300 m-1 w-full">-->
     <div id="comments">
       {% for comment in todo_focus.comments %}
       {% block comment scoped %}
@@ -89,7 +122,16 @@
     <div class="m-1 w-full">
       <span class="border rounded-full h-8 w-8 inline-block flex justify-center">
         <i class="fa-solid fa-plus text-xl"></i>
-      </span>
+      </span>{% for tag in tags %}
+            <span class="border rounded-full m-1 p-1 bg-indigo-300 text-xs"
+                  hx-trigger="click"
+                  hx-ext="json-enc"
+                  hx-put="{{url_for('update_todo', todo_id=todo_focus.id)}}"
+                  hx-vals='{"tag_id":{{ tag.id }} }'
+            >
+                {{ tag.tag }}
+            </span>
+            {% endfor %}
     </div>
   </div>
   {%endif%}
