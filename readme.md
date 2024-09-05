@@ -35,3 +35,5 @@ fastapi dev src --port 8001
 - Allow multiline comment. Currently triggers save on `Enter`
 - Format comments and comments_input
 - Change label colors
+- add login
+- deploy to 
