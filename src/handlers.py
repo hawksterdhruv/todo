@@ -55,3 +55,14 @@ def add_tag_handler(db: Session, tag_raw: schemas.TagCreate) -> models.Tag:
     db.commit()
     db.refresh(db_tag)
     return db_tag
+
+
+def add_comment_handler(todo_id, raw_comment, db: Session) -> models.Comment:
+    todo: models.Todo = db.query(models.Todo).filter(models.Todo.id == todo_id).one()  # type:ignore
+    db_comment = models.Comment(**raw_comment.model_dump())
+    todo.comments.append(db_comment)
+    db.add(db_comment)
+    db.add(todo)
+    db.commit()
+    db.refresh(db_comment)
+    return db_comment

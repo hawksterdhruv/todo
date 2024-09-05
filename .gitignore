@@ -4,8 +4,6 @@
 
 .idea/
 
-db.json
-todos_db.json
 todo.db
 tailwindcss
 output.css

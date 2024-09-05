@@ -31,9 +31,17 @@ class Todo(TodoBase):
     # tags
 
 
-class Comment(BaseModel):
-    id: int
+class CommentBase(BaseModel):
     comment: str
+    created_at: datetime = datetime.now()
+
+
+class CommentCreate(CommentBase):
+    pass
+
+
+class Comment(CommentBase):
+    id: int
 
     class Config:
         orm_model = True
