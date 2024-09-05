@@ -7,13 +7,11 @@ from jinja2_fragments.fastapi import Jinja2Blocks
 from sqlalchemy.orm import Session
 
 from . import models
+from . import schemas
 from .db import engine, SessionLocal
 from .handlers import (get_incomplete_todos_handler, get_completed_todos_handler, add_todo_handler, update_todo_handler,
                        get_todo_handler, get_all_tags_handler, add_tag_handler, update_todo_tag_handler,
                        add_comment_handler)
-from .schemas import TodoCreate, TagCreate
-
-from .schemas import TodoCreate
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -48,7 +46,7 @@ async def get_todos(request: Request, db: Session = Depends(get_db)):
 @app.post('/todo')
 async def add_todo(request: Request, db: Session = Depends(get_db)):
     raw_todo = await request.json()
-    todo = TodoCreate(**raw_todo)
+    todo = schemas.TodoCreate(**raw_todo)
     todo = add_todo_handler(db, todo)
 
     return templates.TemplateResponse(name="todos.html",
@@ -87,17 +85,19 @@ async def update_todo(todo_id: int, request: Request, db: Session = Depends(get_
 async def add_tag(request: Request, db: Session = Depends(get_db)):
     raw_tag = await request.json()
     logger.info(raw_tag)
-    tag = TagCreate(**raw_tag)
+    tag = schemas.TagCreate(**raw_tag)
     tag = add_tag_handler(db, tag)
     return templates.TemplateResponse(name="todos.html", context={'request': request, 'tag': tag}, block_name='tag')
 
 
-@app.post('/comment')
-async def add_comment(request: Request, db: Session = Depends(get_db)):
+@app.post('/todo/{todo_id}/comment')
+async def add_comment(todo_id, request: Request, db: Session = Depends(get_db)):
     raw_comment = await request.json()
-    comment = add_comment_handler(db, raw_comment)
+    logger.info(raw_comment)
+    comment = schemas.CommentCreate(**raw_comment)
+    comment = add_comment_handler(todo_id, comment, db)
     logger.info(comment)
-    return templates.TemplateResponse(name='todo.html', context={'comment': comment, 'request': request},
+    return templates.TemplateResponse(name='todos.html', context={'comment': comment, 'request': request},
                                       block_name='comment')
 
 
